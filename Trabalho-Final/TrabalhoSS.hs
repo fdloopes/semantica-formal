@@ -141,7 +141,13 @@ cSmallStep (RepeatUntil c b,s) = let(cf,sL) = cSmallStep(c,s) in (Seq c (If b (S
 cSmallStep (For c1 b c2,s) = let(cf,sL) = cSmallStep(c1,s) in (RepeatUntil c2 b,sL)
 
 -- Dupla atribuicao
--- cSmallStep (DAtrib (Var x) e1 (Var y) e2,s)
+-- DA3
+cSmallStep (DAtrib (Var x) (Var y) (Num z) (Num w), s) = let(_,sL) = (Skip,mudaVar s x z) in (Skip, (mudaVar sL y w))
+-- DA2
+cSmallStep (DAtrib (Var x) (Var y) (Num z) e,s) = let(ef,sL) = aSmallStep(e,s) in (DAtrib (Var x) (Var y) (Num z) ef,sL)
+-- DA1
+cSmallStep (DAtrib (Var x) (Var y) e1 e2,s) = let(ef,sL) = aSmallStep(e1,s) in (DAtrib (Var x) (Var y) ef e2,sL)
+
 
 interpretC :: (CExp,Estado) -> (CExp,Estado)
 interpretC(c,s) = if isFinalC c then (c,s) else interpretC (cSmallStep (c,s))
@@ -203,3 +209,7 @@ exemplo11 = (Atrib (Var "y") (Num 0))
 -- y == z ???
 exemplo12 :: BExp
 exemplo12 = Ig (Var"y") (Var"z")
+
+-- x:=23, y:=55
+exemplo13::CExp
+exemplo13 = DAtrib (Var "x") (Var "y") (Num 23) (Num 55)
